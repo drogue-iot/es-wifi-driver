@@ -1,23 +1,15 @@
 #![no_std]
 #![no_main]
-#![macro_use]
-#![allow(incomplete_features)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
-#![feature(concat_idents)]
 
 use embassy_stm32::{
     exti::ExtiInput,
-    flash::Flash,
     time::hz,
     gpio::{Input, Level, Output, Speed, Pull},
     peripherals::{DMA2_CH1, DMA2_CH2, PB13, PE0, PE1, PE8, SPI3},
     spi,
 };
-use embassy_time::Duration;
-use embedded_nal_async::{AddrType, Dns, IpAddr, Ipv4Addr, SocketAddr, TcpConnect};
+use embedded_nal_async::{TcpConnect};
 use embedded_io::asynch::{Write, Read};
 use es_wifi_driver::*;
 use static_cell::StaticCell;
@@ -27,7 +19,6 @@ use panic_probe as _;
 
 // Makes it simpler to use the type:
 type SPI = spi::Spi<'static, SPI3, DMA2_CH2, DMA2_CH1>;
-type SpiError = spi::Error;
 pub type WifiWake = Output<'static, PB13>;
 pub type WifiReset = Output<'static, PE8>;
 pub type WifiCs = Output<'static, PE0>;

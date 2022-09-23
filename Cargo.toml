@@ -26,6 +26,6 @@ std = ["embassy-time/std"]
 default = [ "std" ]
 
 [patch.crates-io]
-embassy-time = { git = "https://github.com/embassy-rs/embassy.git", branch = "master" }
-embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", branch = "master" }
-embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", branch = "master" }
+embassy-executor = {git = "https://github.com/embassy-rs/embassy.git", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
+embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
+embassy-time = { git = "https://github.com/embassy-rs/embassy.git", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
