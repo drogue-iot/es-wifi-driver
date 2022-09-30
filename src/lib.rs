@@ -8,7 +8,7 @@ mod socket_pool;
 
 use socket_pool::SocketPool;
 
-use embedded_hal::digital::blocking::{InputPin, OutputPin};
+use embedded_hal::digital::{InputPin, OutputPin};
 
 use core::fmt::Debug;
 use core::fmt::Write as FmtWrite;
