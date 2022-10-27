@@ -14,18 +14,13 @@ embassy-time = { version = "0.1.0", default-features = false }
 embassy-sync = { version = "0.1.0", default-features = false, features = ["nightly"] }
 
 embedded-hal = { package = "embedded-hal", version = "=1.0.0-alpha.9"}
-embedded-hal-async = { version = "=0.1.0-alpha.2" }
+embedded-hal-async = { version = "=0.1.0-alpha.3" }
 embedded-io = { version = "0.3.0", features = ["async"] }
 embedded-nal-async = { version = "0.2.0" }
 
 [dev-dependencies]
-embassy-executor = { version = "0.1.0", default-features = false, features = ["integrated-timers"] }
+embassy-executor = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", default-features = false, features = ["integrated-timers"], rev = "61560e740dea1b4c7ca036dafd66c834a1ff92e2" }
 
 [features]
 std = ["embassy-time/std"]
 default = [ "std" ]
-
-[patch.crates-io]
-embassy-executor = {git = "https://github.com/embassy-rs/embassy.git", rev = "99284b830455dde9cd91091e2c1f4dda92936f51" }
-embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", rev = "99284b830455dde9cd91091e2c1f4dda92936f51" }
-embassy-time = { git = "https://github.com/embassy-rs/embassy.git", rev = "99284b830455dde9cd91091e2c1f4dda92936f51" }

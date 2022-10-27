@@ -894,7 +894,7 @@ where
     WAKEUP: OutputPin + 'a,
     READY: InputPin + Wait + 'a,
 {
-    type WriteFuture<'m> = impl Future<Output = Result<usize, Self::Error>>
+    type WriteFuture<'m> = impl Future<Output = Result<usize, Self::Error>> + 'm
     where
         Self: 'm;
 
@@ -923,7 +923,7 @@ where
     WAKEUP: OutputPin + 'a,
     READY: InputPin + Wait + 'a,
 {
-    type ReadFuture<'m> = impl Future<Output = Result<usize, Self::Error>>
+    type ReadFuture<'m> = impl Future<Output = Result<usize, Self::Error>> + 'm
     where
         Self: 'm;
 
