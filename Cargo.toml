@@ -29,11 +29,8 @@ embedded-io = { version = "0.3.0", features = ["async"] }
 embedded-nal-async = { version = "0.2.0" }
 
 [dev-dependencies]
-embassy-executor = { version = "0.1.0", default-features = false, features = ["integrated-timers"] }
+embassy-executor = { default-features = false, features = ["integrated-timers"], git = "https://github.com/embassy-rs/embassy.git", rev = "61560e740dea1b4c7ca036dafd66c834a1ff92e2" }
 
 [features]
 std = ["embassy-time/std"]
 default = [ "std" ]
-
-[patch.crates-io]
-embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", rev = "61560e740dea1b4c7ca036dafd66c834a1ff92e2" }
