@@ -17,7 +17,7 @@ use embassy_sync::{
     blocking_mutex::raw::NoopRawMutex,
     channel::{Channel, DynamicSender},
 };
-use embassy_time::{block_for, with_timeout, Duration, Timer};
+use embassy_time::{block_for, with_timeout, Duration, Timer, Instant};
 use embedded_hal_async::digital::Wait;
 use embedded_hal_async::spi::*;
 use embedded_nal_async::*;
@@ -854,16 +854,27 @@ where
     READY: InputPin + Wait + 'a,
 {
     async fn connect(&mut self, remote: SocketAddr) -> Result<(), SocketError> {
-        let mut adapter = self.adapter.adapter.lock().await;
+        let timeout = Instant::now() + self.connect_timeout;
+        while Instant::now() < timeout {
+            let mut adapter = self.adapter.adapter.lock().await;
 
-        if adapter.is_connected(self.handle)? {
-            adapter.close(self.handle).await?;
-        }
+            if adapter.is_connected(self.handle)? {
+                adapter.close(self.handle).await?;
+            }
 
-        match with_timeout(self.connect_timeout, adapter.connect(self.handle, remote)).await {
-            Ok(r) => r,
-            Err(_) => Err(SocketError::ConnectError),
+            match with_timeout(self.connect_timeout, adapter.connect(self.handle, remote)).await {
+                Ok(Err(e)) => {
+                    Timer::after(Duration::from_millis(100)).await;
+                }
+                Ok(r) => {
+                    return r
+                }
+                Err(_) => {
+                    return Err(SocketError::ConnectError)
+                }
+            }
         }
+        Err(SocketError::ConnectError)
     }
 }
 
