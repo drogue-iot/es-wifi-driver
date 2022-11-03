@@ -9,6 +9,7 @@ use embassy_stm32::{
     peripherals::{DMA2_CH1, DMA2_CH2, PB13, PE0, PE1, PE8, SPI3},
     spi,
 };
+use embassy_time::{Duration, Timer};
 use embedded_nal_async::{TcpConnect};
 use embedded_io::asynch::{Write, Read};
 use es_wifi_driver::*;
@@ -53,11 +54,12 @@ async fn main(spawner: embassy_executor::Spawner) {
     spawner.spawn(network_task(network)).unwrap();
 
     loop {
-        let mut connection = network.connect("127.0.0.1:8080".parse().unwrap()).await.unwrap();
+        let mut connection = network.connect("192.168.1.2:8088".parse().unwrap()).await.unwrap();
         connection.write(b"ping").await.unwrap();
         let mut rx = [0; 4];
         let l = connection.read(&mut rx[..]).await.unwrap();
         assert_eq!(4, l);
+        Timer::after(Duration::from_secs(1)).await;
     }
 }
 
