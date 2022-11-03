@@ -863,7 +863,7 @@ where
             }
 
             match with_timeout(self.connect_timeout, adapter.connect(self.handle, remote)).await {
-                Ok(Err(e)) => {
+                Ok(Err(_e)) => {
                     Timer::after(Duration::from_millis(100)).await;
                 }
                 Ok(r) => {
