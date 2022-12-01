@@ -17,9 +17,10 @@ static_cell = "1"
 cortex-m-rt = "0.7.0"
 cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
 
-embedded-nal-async = "0.2.0"
+embedded-nal-async = "0.3.0"
 cfg-if = "1.0.0"
-embedded-io = "0.3.0"
+
+embedded-io = "0.4.0"
 
 atomic-polyfill = "1"
 embassy-executor = { version = "0.1.0", default-features = false, features=["nightly", "integrated-timers"] }
@@ -30,7 +31,7 @@ embedded-hal = { version = "0.2.4", features = ["unproven"] }
 es-wifi-driver = { path = "../../", default-features = false, features = ["defmt"] }
 
 [patch.crates-io]
-embassy-stm32 = {git = "https://github.com/embassy-rs/embassy.git", rev = "61560e740dea1b4c7ca036dafd66c834a1ff92e2" }
-embassy-embedded-hal = {git = "https://github.com/embassy-rs/embassy.git", rev = "61560e740dea1b4c7ca036dafd66c834a1ff92e2" }
-embassy-hal-common = { git = "https://github.com/embassy-rs/embassy.git", rev = "61560e740dea1b4c7ca036dafd66c834a1ff92e2" }
-embassy-executor = {git = "https://github.com/embassy-rs/embassy.git", rev = "61560e740dea1b4c7ca036dafd66c834a1ff92e2" }
+embassy-stm32 = {git = "https://github.com/embassy-rs/embassy.git", rev = "645fb66a5122bdc8180e0e65d076ca103431a426" }
+embassy-embedded-hal = {git = "https://github.com/embassy-rs/embassy.git", rev = "645fb66a5122bdc8180e0e65d076ca103431a426" }
+embassy-hal-common = { git = "https://github.com/embassy-rs/embassy.git", rev = "645fb66a5122bdc8180e0e65d076ca103431a426" }
+embassy-executor = {git = "https://github.com/embassy-rs/embassy.git", rev = "645fb66a5122bdc8180e0e65d076ca103431a426" }
