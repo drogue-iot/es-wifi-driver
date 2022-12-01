@@ -1,5 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-#![feature(type_alias_impl_trait)]
+#![feature(async_fn_in_trait)]
+#![feature(impl_trait_projections)]
+#![allow(incomplete_features)]
 #![doc = include_str!("../README.md")]
 #![warn(missing_docs)]
 mod fmt;
@@ -10,20 +12,19 @@ use socket_pool::SocketPool;
 
 use embedded_hal::digital::{InputPin, OutputPin};
 
-use core::fmt::Debug;
-use core::fmt::Write as FmtWrite;
-use core::future::Future;
-use embassy_sync::{
-    blocking_mutex::raw::NoopRawMutex,
-    channel::{Channel, DynamicSender},
+use {
+    core::fmt::{Debug, Write as FmtWrite},
+    embassy_sync::{
+        blocking_mutex::raw::NoopRawMutex,
+        channel::{Channel, DynamicSender},
+    },
+    embassy_time::{block_for, with_timeout, Duration, Instant, Timer},
+    embedded_hal_async::{digital::Wait, spi::*},
+    embedded_nal_async::*,
+    futures_intrusive::sync::LocalMutex,
+    heapless::String,
+    parser::{CloseResponse, ConnectResponse, JoinResponse, ReadResponse, WriteResponse},
 };
-use embassy_time::{block_for, with_timeout, Duration, Timer, Instant};
-use embedded_hal_async::digital::Wait;
-use embedded_hal_async::spi::*;
-use embedded_nal_async::*;
-use futures_intrusive::sync::LocalMutex;
-use heapless::String;
-use parser::{CloseResponse, ConnectResponse, JoinResponse, ReadResponse, WriteResponse};
 
 type DriverMutex = NoopRawMutex;
 
@@ -826,22 +827,20 @@ where
 {
     type Error = SocketError;
     type Connection<'m> = EsWifiSocket<'m, SPI, CS, RESET, WAKEUP, READY> where Self: 'm;
-    type ConnectFuture<'m> = impl Future<Output = Result<Self::Connection<'m>, Self::Error>> + 'm
-	where
-		Self: 'm;
 
-    fn connect<'m>(&'m self, remote: SocketAddr) -> Self::ConnectFuture<'m> {
-        async move {
-            let handle = self.new_socket().await?;
-            let mut socket = EsWifiSocket {
-                handle,
-                adapter: self,
-                control: self.control.sender().into(),
-                connect_timeout: Duration::from_secs(60),
-            };
-            socket.connect(remote).await?;
-            Ok(socket)
-        }
+    async fn connect<'m>(&'m self, remote: SocketAddr) -> Result<Self::Connection<'m>, Self::Error>
+    where
+        Self: 'm,
+    {
+        let handle = self.new_socket().await?;
+        let mut socket = EsWifiSocket {
+            handle,
+            adapter: self,
+            control: self.control.sender().into(),
+            connect_timeout: Duration::from_secs(60),
+        };
+        socket.connect(remote).await?;
+        Ok(socket)
     }
 }
 
@@ -866,12 +865,8 @@ where
                 Ok(Err(_e)) => {
                     Timer::after(Duration::from_millis(100)).await;
                 }
-                Ok(r) => {
-                    return r
-                }
-                Err(_) => {
-                    return Err(SocketError::ConnectError)
-                }
+                Ok(r) => return r,
+                Err(_) => return Err(SocketError::ConnectError),
             }
         }
         Err(SocketError::ConnectError)
@@ -905,23 +900,13 @@ where
     WAKEUP: OutputPin + 'a,
     READY: InputPin + Wait + 'a,
 {
-    type WriteFuture<'m> = impl Future<Output = Result<usize, Self::Error>> + 'm
-    where
-        Self: 'm;
-
-    fn write<'m>(&'m mut self, buf: &'m [u8]) -> Self::WriteFuture<'m> {
-        async move {
-            let mut adapter = self.adapter.adapter.lock().await;
-            adapter.write(self.handle, buf).await
-        }
+    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+        let mut adapter = self.adapter.adapter.lock().await;
+        adapter.write(self.handle, buf).await
     }
 
-    type FlushFuture<'m> = impl Future<Output = Result<(), Self::Error>>
-    where
-        Self: 'm;
-
-    fn flush<'m>(&'m mut self) -> Self::FlushFuture<'m> {
-        async move { Ok(()) }
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        Ok(())
     }
 }
 
@@ -934,15 +919,9 @@ where
     WAKEUP: OutputPin + 'a,
     READY: InputPin + Wait + 'a,
 {
-    type ReadFuture<'m> = impl Future<Output = Result<usize, Self::Error>> + 'm
-    where
-        Self: 'm;
-
-    fn read<'m>(&'m mut self, buf: &'m mut [u8]) -> Self::ReadFuture<'m> {
-        async move {
-            let mut adapter = self.adapter.adapter.lock().await;
-            adapter.read(self.handle, buf).await
-        }
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        let mut adapter = self.adapter.adapter.lock().await;
+        adapter.read(self.handle, buf).await
     }
 }
 
