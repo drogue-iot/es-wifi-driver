@@ -1,6 +1,6 @@
 [package]
 name = "es-wifi-driver"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 license = "Apache-2.0"
 readme = "README.md"
@@ -28,7 +28,7 @@ defmt = { version = "0.3", optional = true }
 embedded-hal = "=1.0.0-alpha.9"
 embedded-hal-async = "=0.2.0-alpha.0"
 embedded-io = { version = "0.4.0", features = ["async"] }
-embedded-nal-async = "0.3.0"
+embedded-nal-async = "0.4.0"
 
 [dev-dependencies]
 embassy-executor = { default-features = false, features = ["integrated-timers"], git = "https://github.com/embassy-rs/embassy.git", rev = "645fb66a5122bdc8180e0e65d076ca103431a426" }
